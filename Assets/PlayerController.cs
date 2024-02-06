@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -23,6 +25,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     float jumpSpeed = 1000;
 
+    public int bulletMax = 10;
+
+    [SerializeField]
+    private TMP_Text ammoDisplay;
+
     bool onGround = true;
 
     int jumpCount = 0;
@@ -31,6 +38,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = gameObject.GetComponent<Rigidbody>();
+        ammoDisplay.text = bulletMax.ToString();
     }
 
     // Update is called once per frame
@@ -56,11 +64,15 @@ public class PlayerController : MonoBehaviour
     void OnFire() // this function will be called when the fire action is triggered, e.g. when we press the left mouse button
     {
         Debug.Log("FIRING");
+        if (bulletMax > 0)
+        {
+            bulletMax--;
+            ammoDisplay.text = bulletMax.ToString();
+            GameObject bulletInstance = Instantiate(bullet, transform.position + 0.5f * transform.forward, Quaternion.identity);  // add f because its a float
+            Rigidbody bulletRigidbody = bulletInstance.GetComponent<Rigidbody>();
+            bulletRigidbody.AddForce(bulletSpeed * transform.forward);
+        }
 
-        GameObject bulletInstance = Instantiate(bullet, transform.position + 0.5f * transform.forward, Quaternion.identity);  // add f because its a float
-        Rigidbody bulletRigidbody = bulletInstance.GetComponent<Rigidbody>();
-
-        bulletRigidbody.AddForce(bulletSpeed * transform.forward);
     }
 
     void OnJump()
